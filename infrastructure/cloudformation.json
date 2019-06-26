@@ -1,0 +1,22 @@
+"Resources": {
+  "MyModel": {
+    "Type": "AWS::Lambda::Function",
+    "Properties": {
+      "Handler": "function.lambda_handler",
+      "FunctionName" : "test-model-bobby",
+      "Code": {
+        "S3Bucket": "bobbywlindseytest",
+        "S3Key": "function.zip"
+      },
+      "Description": "cfn-create-lambda-test-bobby",
+      "Role": "arn:aws:iam::842934677031:role/service-role/testlambdauser",
+      "Runtime": "python3.7",
+      "Timeout": 60
+    },
+    "Metadata": {
+      "Lambda": {
+        "Description": "Lambda function test for Bobby Lindsey"
+      }
+    }
+  }
+}
