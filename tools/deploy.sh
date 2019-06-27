@@ -37,5 +37,16 @@ aws s3 cp function.zip s3://bobbywlindseytest
 echo "Removing zip file..."
 rm -f function.zip
 
+# train the model locally
+python train.py
+
+# upload the model params to s3
+echo "Uploading model params to s3..."
+aws s3 cp regression_model.joblib s3://bobbywlindseytest
+# cleanup
+echo "Removing model params..."
+rm -f regression_model.joblib
+
+# deploy the stack
 echo "Deploying stack..."
-aws cloudformation deploy --template-file ../infrastructure/cloudformation.json --stack-name my-test-stack
+aws cloudformation deploy --template-file ../infrastructure/cloudformation.json --stack-name my-test-stack --capabilities CAPABILITY_NAMED_IAM

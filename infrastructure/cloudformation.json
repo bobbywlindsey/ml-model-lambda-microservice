@@ -32,6 +32,27 @@
           "LicenseInfo": "MIT"
       }
     },
+    
+    "LambdaRole": {
+      "Type": "AWS::IAM::Role",
+      "Properties": {
+        "RoleName": "test-lambda-role-for-bobby",
+        "AssumeRolePolicyDocument": {
+          "Version" : "2012-10-17",
+          "Statement": [ {
+            "Effect": "Allow",
+            "Principal": {
+               "Service": ["lambda.amazonaws.com"]
+            },
+            "Action": ["sts:AssumeRole"]
+         } ]
+         },
+        "Path": "/",
+        "ManagedPolicyArns": [
+          "arn:aws:iam::aws:policy/AWSLambdaExecute"
+        ]
+      }
+    },
 
     "MyModel": {
       "Type": "AWS::Lambda::Function",
@@ -48,8 +69,13 @@
           {"Ref": "ScikitLearnLayer"}
         ],
         "Description": "cfn-create-lambda-test-bobby",
-        "Role": "arn:aws:iam::842934677031:role/service-role/testlambdauser",
+        "Role": {  
+          "Fn::GetAtt":[  
+             "LambdaRole",
+             "Arn"
+          ]},
         "Runtime": "python3.7",
+        "MemorySize": 192,
         "Timeout": 60
       },
       "Metadata": {

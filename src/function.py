@@ -1,31 +1,23 @@
 from sklearn import linear_model
-from sklearn import datasets
 import numpy as np
+from joblib import load
+import boto3
+from io import BytesIO
 
 def lambda_handler(event, context):
-    # Load the diabetes dataset
-    diabetes = datasets.load_diabetes()
+    # import model from s3
+    s3 = boto3.resource('s3')
+    with BytesIO() as model:
+        s3.Bucket("bobbywlindseytest").download_fileobj("regression_model.joblib", model)
+        model.seek(0)    # move back to the beginning after writing
+        regression_model = load(model)
 
+    # get user input
+    usr_input = event['input']
 
-    # Use only one feature
-    diabetes_X = diabetes.data[:, np.newaxis, 2]
+    # make predictions using the testing set
+    diabetes_y_pred = regression_model.predict([[usr_input]])
 
-    # Split the data into training/testing sets
-    diabetes_X_train = diabetes_X[:-20]
-    diabetes_X_test = diabetes_X[-20:]
+    # return predictions
+    return(str(diabetes_y_pred[0]))
 
-    # Split the targets into training/testing sets
-    diabetes_y_train = diabetes.target[:-20]
-    diabetes_y_test = diabetes.target[-20:]
-
-    # Create linear regression object
-    regr = linear_model.LinearRegression()
-    # Train the model using the training sets
-    regr.fit(diabetes_X_train, diabetes_y_train)
-
-    # Make predictions using the testing set
-    diabetes_y_pred = regr.predict(diabetes_X_test)
-
-    # The coefficients
-    return ('Coefficients: \n', str(regr.coef_))
-    #return "aws lambda in python using zip file"
