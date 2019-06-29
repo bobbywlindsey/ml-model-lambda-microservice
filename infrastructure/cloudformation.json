@@ -93,15 +93,6 @@
       }
     },
 
-    "ApiGatewayModel": {
-      "Type": "AWS::ApiGateway::Model",
-      "Properties": {
-        "ContentType": "application/json",
-        "RestApiId": {"Ref": "apiGateway"},
-        "Schema": {}
-      }
-    },
-
     "apiGatewayLambdaPermission": {
       "Type": "AWS::Lambda::Permission",
       "Properties": {
