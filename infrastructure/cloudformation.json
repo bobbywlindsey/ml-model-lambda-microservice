@@ -54,7 +54,7 @@
       }
     },
 
-    "MyModel": {
+    "LambdaFunction": {
       "Type": "AWS::Lambda::Function",
       "Properties": {
         "Handler": "function.lambda_handler",
@@ -83,6 +83,67 @@
           "Description": "Lambda function test for Bobby Lindsey"
         }
       }
+    },
+
+    "apiGateway": {
+      "Type": "AWS::ApiGateway::RestApi",
+      "Properties": {
+        "Name": "my-api",
+        "Description": "My test API used for lambda predictive model"
+      }
+    },
+
+    "ApiGatewayModel": {
+      "Type": "AWS::ApiGateway::Model",
+      "Properties": {
+        "ContentType": "application/json",
+        "RestApiId": {"Ref": "apiGateway"},
+        "Schema": {}
+      }
+    },
+
+    "apiGatewayLambdaPermission": {
+      "Type": "AWS::Lambda::Permission",
+      "Properties": {
+        "Action": "lambda:InvokeFunction",
+        "FunctionName": {"Ref": "LambdaFunction"},
+        "Principal": "apigateway.amazonaws.com",
+        "SourceArn": {
+          "Fn::Sub": "arn:aws:execute-api:${AWS::Region}:${AWS::AccountId}:${apiGateway}/*/POST/"
+        }
+      }
+    },
+
+    "apiGatewayRootMethod": {
+      "Type": "AWS::ApiGateway::Method",
+      "Properties": {
+        "AuthorizationType": "NONE",
+        "HttpMethod": "POST",
+        "Integration": {
+          "IntegrationHttpMethod": "POST",
+          "Type": "AWS_PROXY",
+          "Uri": {
+            "Fn::Sub": "arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${LambdaFunction.Arn}/invocations"
+          }
+        },
+        "ResourceId":{
+            "Fn::GetAtt":[  
+              "apiGateway",
+              "RootResourceId"
+            ]},
+        "RestApiId": {"Ref": "apiGateway"}
+      }
+    },
+
+    "apiGatewayDeployment": {
+      "Type": "AWS::ApiGateway::Deployment",
+      "DependsOn": ["apiGatewayRootMethod"],
+      "Properties": {
+        "RestApiId": {"Ref": "apiGateway"},
+        "StageName": "TestStageName",
+        "Description": "Lambda API Deployment"
+      }
     }
+
   }
 }
