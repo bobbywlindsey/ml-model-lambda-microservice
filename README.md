@@ -1,4 +1,4 @@
-# deploy-lambda-function
+# ml-model-lambda-microservice
 
 How to deploy a simple scikit-learn model using a Python lambda function with API Gatweay configuration via CloudFormation.
 
@@ -24,4 +24,3 @@ To delete all resources you created in AWS (except for the S3 uploads), run:
 
 `./tools/tear-down.sh`
 
-Note that instead of pulling model parameters from S3, we could instead include them as a separate file in the lambda function to save on transfer costs.
